@@ -51,7 +51,7 @@ const P2: React.FC<{ d: number; v: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const rows = [["panaderia", "barberia", "tienda", "dental"], ["reposteria", "gimnasio", "floreria", "salon"], ["restaurante", "mascotas", "inmobiliaria", "panaderia"]];
   const clickAt = 92;
-  const cx = interpolate(f, [55, clickAt], [880, 430], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+  const cx = interpolate(f, [55, clickAt], [880, 120], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   const cy = interpolate(f, [55, clickAt], [1350, 760], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   const stop = interpolate(f, [clickAt - 20, clickAt], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const t = Math.min(f, clickAt);
@@ -63,7 +63,7 @@ const P2: React.FC<{ d: number; v: number }> = ({ d, v }) => {
           const dir = ri % 2 ? 1 : -1; const x = -300 + dir * t * 4.2 * (1 - 0) + (ri === 1 ? -220 : 0);
           return <div key={ri} style={{ display: "flex", gap: 26, transform: `translateX(${x}px)`, opacity: pop(f, fps, ri * 5, 14) }}>
             {[...r, ...r].map((n, i) => {
-              const chosen = ri === 1 && i === 1 && f >= clickAt;
+              const chosen = ri === 1 && i === 0 && f >= clickAt;
               return <div key={i} style={{ flex: "none", width: 460, borderRadius: 22, overflow: "hidden", border: `6px solid ${chosen ? C.coral : "rgba(255,255,255,.08)"}`, transform: `scale(${chosen ? 1.06 : 1})` }}><Img src={shot(n)} style={{ width: "100%", display: "block" }} /></div>;
             })}
           </div>;
@@ -131,7 +131,7 @@ const P5: React.FC<{ d: number; v: number }> = ({ d, v }) => {
     <AbsoluteFill style={{ background: glow(C.wa) }}>
       <Title color={C.cream} size={110} top={150}>¡Listo! 🎉</Title>
       <Laptop src={shot("reposteria_full")} x={60} y={420} w={720} delay={0} />
-      <Phone src={shot("reposteria_full")} x={640} y={560} w={360} h={700} scroll={300} delay={10} />
+      <Phone src={shot("reposteria_mob")} x={640} y={560} w={360} h={700} scroll={0} delay={10} />
       <div style={{ position: "absolute", left: 80, top: 1000, display: "grid", gap: 20 }}>
         {items.map((it, i) => { const p = pop(f, fps, 40 + i * 18, 9); return <div key={it} style={{ display: "flex", gap: 16, alignItems: "center", fontFamily: "DM", fontWeight: 900, fontSize: 44, color: C.cream, transform: `translateX(${(1 - p) * -200}px)`, opacity: p }}><span style={{ width: 62, height: 62, borderRadius: 31, background: C.wa, display: "grid", placeItems: "center", fontSize: 34 }}>✓</span>{it}</div>; })}
       </div>
