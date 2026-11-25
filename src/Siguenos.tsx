@@ -3,13 +3,13 @@ import { AbsoluteFill, Img, interpolate, useCurrentFrame, useVideoConfig, Easing
 import { C, shot, useFont, Logo, pop, Fx } from "./ComoFunciona";
 
 // Post del medio (1080x1350): toda la página de SitioYa bajando en un celular + "Síguenos"
-export const SIG_FRAMES = 840;
+export const SIG_FRAMES = 1050;
 export const Siguenos: React.FC = () => {
   useFont();
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const IMG_H = 14986 * (484 / 500); const VIEW = 964;
   // baja por tramos con pausas para que se pueda leer
-  const STOPS = 12; const seg = (SIG_FRAMES - 60) / STOPS; const k = Math.max(0, f - 30);
+  const STOPS = Math.ceil((IMG_H - VIEW) / (VIEW * 0.85)); const seg = (SIG_FRAMES - 60) / STOPS; const k = Math.max(0, f - 30);
   const i = Math.min(STOPS - 1, Math.floor(k / seg)); const r = Math.min(1, ((k - i * seg) / seg) / 0.4);
   const step = (IMG_H - VIEW) / STOPS;
   const y = -(i * step + step * Easing.inOut(Easing.cubic)(Math.min(1, r)));
