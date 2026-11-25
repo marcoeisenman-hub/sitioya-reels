@@ -4,9 +4,9 @@ import {
   interpolate, spring, staticFile, useCurrentFrame, useVideoConfig, Easing,
 } from "remotion";
 
-const C = { coral: "#FF6B5B", navy: "#1B2A4A", mint: "#7ED6C1", cream: "#FFF6EC", yel: "#FFD36B", blush: "#FFB4A6", dark: "#0E1626", wa: "#25D366" };
-const shot = (n: string) => staticFile(`shots/${n}.jpg`);
-const sfx = (n: string) => staticFile(`sfx/${n}.wav`);
+export const C = { coral: "#FF6B5B", navy: "#1B2A4A", mint: "#7ED6C1", cream: "#FFF6EC", yel: "#FFD36B", blush: "#FFB4A6", dark: "#0E1626", wa: "#25D366" };
+export const shot = (n: string) => staticFile(`shots/${n}.jpg`);
+export const sfx = (n: string) => staticFile(`sfx/${n}.wav`);
 
 // Escenas: duración en frames (30 fps) y frase (voz + subtítulos)
 export const SCENES = [
@@ -19,8 +19,12 @@ export const SCENES = [
   { d: 190, v: 160, t: "SitioYa. Tu negocio en internet, ya. Link en la bio 👆" },
 ];
 export const TOTAL = SCENES.reduce((a, s) => a + s.d, 0);
+// Voz masculina (es-PA-Roberto): mismas frases, otros tiempos
+const VH = [6.96, 4.224, 4.416, 5.136, 5.088, 4.992, 6.24];
+export const SCENES_H = SCENES.map((s, i) => { const v = Math.ceil(VH[i] * 30); return { ...s, v, d: Math.max(s.d, v + 30) }; });
+export const TOTAL_H = SCENES_H.reduce((a, s) => a + s.d, 0);
 
-const useFont = () => {
+export const useFont = () => {
   const [h] = useState(() => delayRender("fuente"));
   useEffect(() => {
     const f = new FontFace("DM", `url(${staticFile("DMSans.ttf")})`);
@@ -28,16 +32,16 @@ const useFont = () => {
   }, [h]);
 };
 
-const Logo: React.FC<{ s?: number }> = ({ s = 84 }) => (
+export const Logo: React.FC<{ s?: number }> = ({ s = 84 }) => (
   <svg width={s} height={s} viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill={C.coral} /><rect x="16" y="20" width="60" height="47" rx="7" fill={C.cream} stroke={C.navy} strokeWidth="6" /><path d="M16 33H76" stroke={C.navy} strokeWidth="6" /><path d="M25 44.5H45M25 56H37" stroke={C.navy} strokeWidth="6" strokeLinecap="round" /><path d="M54 46L54 84L63.5 74.5L70 88L76.5 85L70 71.5L83.5 71.5Z" fill={C.navy} stroke={C.coral} strokeWidth="9" strokeLinejoin="round" paintOrder="stroke" /></svg>
 );
 
-const pop = (frame: number, fps: number, delay = 0, damping = 11) => spring({ frame: frame - delay, fps, config: { damping, stiffness: 160 } });
+export const pop = (frame: number, fps: number, delay = 0, damping = 11) => spring({ frame: frame - delay, fps, config: { damping, stiffness: 160 } });
 
 // Subtítulos tipo karaoke: aparecen palabra por palabra
-const Subs: React.FC<{ text: string; dur: number; dark?: boolean }> = ({ text, dur, dark }) => {
+export const Subs: React.FC<{ text: string; dur: number; dark?: boolean; v?: number }> = ({ text, dur, dark, v }) => {
   const sc = SCENES.find((x) => x.t === text);
-  const vd = sc ? sc.v : dur * 0.8;
+  const vd = v ?? (sc ? sc.v : dur * 0.8);
   const f = useCurrentFrame();
   const words = text.split(" ");
   const shown = interpolate(f, [6, 6 + vd * 0.92], [0, words.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -53,17 +57,17 @@ const Subs: React.FC<{ text: string; dur: number; dark?: boolean }> = ({ text, d
   );
 };
 
-const Title: React.FC<{ children: React.ReactNode; color: string; size?: number; top?: number }> = ({ children, color, size = 100, top = 120 }) => {
+export const Title: React.FC<{ children: React.ReactNode; color: string; size?: number; top?: number }> = ({ children, color, size = 100, top = 120 }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const p = pop(f, fps, 2);
   return <div style={{ position: "absolute", left: 80, right: 80, top, fontFamily: "DM", fontWeight: 900, fontSize: size, letterSpacing: "-0.045em", lineHeight: 0.98, color, transform: `translateY(${(1 - p) * 120}px) rotate(${(1 - p) * -4}deg)`, opacity: p }}>{children}</div>;
 };
 
-const Brand: React.FC<{ color: string; ya?: string }> = ({ color, ya = C.coral }) => (
+export const Brand: React.FC<{ color: string; ya?: string }> = ({ color, ya = C.coral }) => (
   <div style={{ position: "absolute", left: 80, bottom: 70, display: "flex", alignItems: "center", gap: 16, fontFamily: "DM", fontWeight: 800, fontSize: 40, color }}><Logo s={70} />Sitio<b style={{ color: ya }}>Ya</b></div>
 );
 
-const Phone: React.FC<{ src: string; x: number; y: number; w: number; h: number; scroll?: number; delay?: number; children?: React.ReactNode }> = ({ src, x, y, w, h, scroll = 0, delay = 0, children }) => {
+export const Phone: React.FC<{ src: string; x: number; y: number; w: number; h: number; scroll?: number; delay?: number; children?: React.ReactNode }> = ({ src, x, y, w, h, scroll = 0, delay = 0, children }) => {
   const f = useCurrentFrame(); const { fps, durationInFrames } = useVideoConfig();
   const p = pop(f, fps, delay, 14);
   const ty = interpolate(f, [delay + 15, durationInFrames - 10], [0, -scroll], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) });
@@ -77,7 +81,7 @@ const Phone: React.FC<{ src: string; x: number; y: number; w: number; h: number;
   );
 };
 
-const Laptop: React.FC<{ src: string; x: number; y: number; w: number; delay?: number; zoom?: boolean }> = ({ src, x, y, w, delay = 0, zoom = true }) => {
+export const Laptop: React.FC<{ src: string; x: number; y: number; w: number; delay?: number; zoom?: boolean }> = ({ src, x, y, w, delay = 0, zoom = true }) => {
   const f = useCurrentFrame(); const { fps, durationInFrames } = useVideoConfig();
   const p = pop(f, fps, delay, 14);
   const z = zoom ? interpolate(f, [0, durationInFrames], [1, 1.08]) : 1;
@@ -92,11 +96,11 @@ const Laptop: React.FC<{ src: string; x: number; y: number; w: number; delay?: n
   );
 };
 
-const Whoosh: React.FC = () => <Audio src={sfx("whoosh")} volume={0.3} />;
-const Fx: React.FC<{ at: number; n: string; v?: number }> = ({ at, n, v = 0.4 }) => <Sequence from={at} layout="none"><Audio src={sfx(n)} volume={v} /></Sequence>;
+export const Whoosh: React.FC = () => <Audio src={sfx("whoosh")} volume={0.3} />;
+export const Fx: React.FC<{ at: number; n: string; v?: number }> = ({ at, n, v = 0.4 }) => <Sequence from={at} layout="none"><Audio src={sfx(n)} volume={v} /></Sequence>;
 
 /* ---------- Escenas ---------- */
-const S1: React.FC<{ d: number }> = ({ d }) => {
+const S1: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const words = ["Tu", "página", "en", "3", "pasos", "🚀"];
   return (
@@ -109,14 +113,14 @@ const S1: React.FC<{ d: number }> = ({ d }) => {
           return <span key={i} style={{ display: "inline-block", marginRight: 30, color: big || w === "pasos" ? C.navy : C.cream, transform: `translateY(${(1 - p) * 140}px) scale(${big ? 1 + 0.25 * Math.max(0, Math.sin((f - 50) / 6)) * (f > 50 && f < 80 ? 1 : 0) : 1})`, opacity: p }}>{w}</span>;
         })}
       </div>
-      <Subs text={SCENES[0].t} dur={d} />
+      <Subs text={SCENES[0].t} dur={d} v={v} />
       <Brand color={C.cream} ya={C.navy} />
       {words.map((_, i) => <Fx key={i} at={8 + i * 6} n="pop" v={0.22} />)}
     </AbsoluteFill>
   );
 };
 
-const S2: React.FC<{ d: number }> = ({ d }) => {
+const S2: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const tpl = ["panaderia", "barberia", "tienda", "reposteria", "gimnasio", "restaurante"];
   const pick = 1; const clickAt = 62;
@@ -136,7 +140,7 @@ const S2: React.FC<{ d: number }> = ({ d }) => {
       </div>
       {grow > 0.01 && <div style={{ position: "absolute", inset: 0, opacity: grow }}><Laptop src={shot("barberia")} x={60} y={480} w={960} zoom={false} /></div>}
       <svg width="70" height="90" viewBox="0 0 24 30" style={{ position: "absolute", left: cx, top: cy, opacity: f < clickAt + 20 ? 1 : 0, transform: `scale(${f >= clickAt && f < clickAt + 5 ? 0.85 : 1})` }}><path d="M2 2 L2 24 L8 18 L12 28 L16 26 L12 17 L20 17 Z" fill="#fff" stroke="#000" strokeWidth="1.6" strokeLinejoin="round" /></svg>
-      <Subs text={SCENES[1].t} dur={d} />
+      <Subs text={SCENES[1].t} dur={d} v={v} />
       <Brand color={C.cream} />
       {tpl.map((_, i) => <Fx key={i} at={6 + i * 4} n="tick" v={0.2} />)}
       <Fx at={clickAt} n="click" v={0.55} />
@@ -144,7 +148,7 @@ const S2: React.FC<{ d: number }> = ({ d }) => {
   );
 };
 
-const S3: React.FC<{ d: number }> = ({ d }) => {
+const S3: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame();
   const pulse = 1 + 0.12 * Math.max(0, Math.sin(f / 5));
   return (
@@ -153,14 +157,14 @@ const S3: React.FC<{ d: number }> = ({ d }) => {
       <Phone src={shot("panaderia_full")} x={250} y={330} w={580} h={1060} scroll={470} delay={2}>
         <div style={{ position: "absolute", right: 22, bottom: 26, background: C.wa, color: "#fff", fontFamily: "DM", fontWeight: 800, fontSize: 30, padding: "14px 24px", borderRadius: 99, transform: `scale(${f > 40 ? pulse : 0})`, boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>💬 WhatsApp</div>
       </Phone>
-      <Subs text={SCENES[2].t} dur={d} />
+      <Subs text={SCENES[2].t} dur={d} v={v} />
       <Brand color={C.navy} />
       <Fx at={42} n="pop" v={0.35} />
     </AbsoluteFill>
   );
 };
 
-const S4: React.FC<{ d: number }> = ({ d }) => {
+const S4: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const msgs: [boolean, string][] = [
     [false, "Hola! Quiero la plantilla de panadería 🥐"],
@@ -182,14 +186,14 @@ const S4: React.FC<{ d: number }> = ({ d }) => {
           })}
         </div>
       </Phone>
-      <Subs text={SCENES[3].t} dur={d} dark />
+      <Subs text={SCENES[3].t} dur={d} v={v} dark />
       <Brand color={C.navy} />
       {msgs.map(([me], i) => <Fx key={i} at={at(i)} n={me ? "send" : "notif"} v={me ? 0.3 : 0.45} />)}
     </AbsoluteFill>
   );
 };
 
-const S5: React.FC<{ d: number }> = ({ d }) => {
+const S5: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const a = pop(f, fps, 10, 8); const b = pop(f, fps, 48, 7);
   const card = (p: number, bg: string, fg: string, k: string, price: string, txt: string, rot: number): React.ReactNode => (
@@ -206,14 +210,14 @@ const S5: React.FC<{ d: number }> = ({ d }) => {
         {card(a, "#fff", C.navy, "#E2503F", "$19", "HAZLA TÚ|La plantilla + una guía", -12)}
         {card(b, C.navy, C.cream, C.mint, "$69", "TE LA HACEMOS|Lista en 2 días 🚀", 12)}
       </div>
-      <Subs text={SCENES[4].t} dur={d} dark />
+      <Subs text={SCENES[4].t} dur={d} v={v} dark />
       <Brand color={C.navy} />
       <Fx at={10} n="pop" v={0.4} /><Fx at={48} n="pop" v={0.45} /><Fx at={52} n="ding" v={0.25} />
     </AbsoluteFill>
   );
 };
 
-const S6: React.FC<{ d: number }> = ({ d }) => {
+const S6: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const dest = [["📸", "Tu bio"], ["💬", "WhatsApp"], ["🔎", "Google"]];
   return (
@@ -231,14 +235,14 @@ const S6: React.FC<{ d: number }> = ({ d }) => {
           </div>;
         })}
       </div>
-      <Subs text={SCENES[5].t} dur={d} />
+      <Subs text={SCENES[5].t} dur={d} v={v} />
       <Brand color={C.cream} ya={C.navy} />
       {dest.map((_, i) => <Fx key={i} at={30 + i * 16} n="click" v={0.4} />)}
     </AbsoluteFill>
   );
 };
 
-const S7: React.FC<{ d: number }> = ({ d }) => {
+const S7: React.FC<{ d: number; v?: number }> = ({ d, v }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const l = pop(f, fps, 0, 9); const ya = pop(f, fps, 28, 6);
   return (
@@ -248,7 +252,7 @@ const S7: React.FC<{ d: number }> = ({ d }) => {
         Tu negocio<br />en internet,<br /><span style={{ display: "inline-block", color: C.coral, transform: `scale(${0.3 + 0.7 * ya}) rotate(${(1 - ya) * -20}deg)`, transformOrigin: "left bottom" }}>ya.</span>
       </div>
       <Laptop src={shot("panaderia")} x={160} y={860} w={760} delay={12} />
-      <Subs text={SCENES[6].t} dur={d} />
+      <Subs text={SCENES[6].t} dur={d} v={v} />
       <div style={{ position: "absolute", left: 80, right: 80, bottom: 70, fontFamily: "DM", fontWeight: 800, fontSize: 44, color: C.mint }}>@sitioya.pty · sitioya.vercel.app</div>
       <Fx at={28} n="pop" v={0.4} /><Fx at={34} n="ding" v={0.3} />
     </AbsoluteFill>
@@ -257,18 +261,19 @@ const S7: React.FC<{ d: number }> = ({ d }) => {
 
 const COMPS = [S1, S2, S3, S4, S5, S6, S7];
 
-export const ComoFunciona: React.FC<{ voz: boolean }> = ({ voz }) => {
+export const ComoFunciona: React.FC<{ voz: boolean; hombre?: boolean }> = ({ voz, hombre }) => {
+  const sc = hombre ? SCENES_H : SCENES;
   useFont();
   let from = 0;
   return (
     <AbsoluteFill style={{ background: C.navy }}>
-      {SCENES.map((s, i) => {
+      {sc.map((s, i) => {
         const Comp = COMPS[i]; const start = from; from += s.d;
         return (
           <Sequence key={i} from={start} durationInFrames={s.d}>
-            <SceneIn><Comp d={s.d} /></SceneIn>
+            <SceneIn><Comp d={s.d} v={s.v} /></SceneIn>
             {i > 0 && <Whoosh />}
-            {voz && <Sequence from={6} layout="none"><Audio src={staticFile(`voz/${i}.mp3`)} volume={1} /></Sequence>}
+            {voz && <Sequence from={6} layout="none"><Audio src={staticFile(`voz/${hombre ? "h" : ""}${i}.mp3`)} volume={1} /></Sequence>}
           </Sequence>
         );
       })}
@@ -277,7 +282,7 @@ export const ComoFunciona: React.FC<{ voz: boolean }> = ({ voz }) => {
 };
 
 // Entrada de cada escena: se desliza desde abajo con un pequeño rebote
-const SceneIn: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SceneIn: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const p = spring({ frame: f, fps, config: { damping: 18, stiffness: 140 } });
   return <AbsoluteFill style={{ transform: `translateY(${(1 - p) * 300}px)`, clipPath: `circle(${p * 150}% at 50% 100%)` }}>{children}</AbsoluteFill>;
