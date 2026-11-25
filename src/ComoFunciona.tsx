@@ -10,13 +10,13 @@ const sfx = (n: string) => staticFile(`sfx/${n}.wav`);
 
 // Escenas: duración en frames (30 fps) y frase (voz + subtítulos)
 export const SCENES = [
-  { d: 190, t: "¿Tu negocio solo vive en Instagram? Te explicamos cómo tener tu página en 3 pasos." },
-  { d: 125, t: "Paso 1: elige una de nuestras 11 plantillas." },
-  { d: 128, t: "Cada una se ve perfecta en el celular, con botón de WhatsApp." },
-  { d: 160, t: "Paso 2: escríbenos y te decimos el precio y cuándo está lista." },
-  { d: 145, t: "Hazla tú desde $19, o te la hacemos desde $69." },
-  { d: 140, t: "Paso 3: comparte tu link en tu bio, en WhatsApp y en Google." },
-  { d: 135, t: "SitioYa. Tu negocio en internet, ya. Link en la bio 👆" },
+  { d: 214, v: 184, t: "¿Tu negocio solo vive en Instagram? Te explicamos cómo tener tu página en 3 pasos." },
+  { d: 146, v: 116, t: "Paso 1: elige una de nuestras 11 plantillas." },
+  { d: 156, v: 126, t: "Cada una se ve perfecta en el celular, con botón de WhatsApp." },
+  { d: 173, v: 143, t: "Paso 2: escríbenos y te decimos el precio y cuándo está lista." },
+  { d: 162, v: 132, t: "Hazla tú desde $19, o te la hacemos desde $69." },
+  { d: 159, v: 129, t: "Paso 3: comparte tu link en tu bio, en WhatsApp y en Google." },
+  { d: 190, v: 160, t: "SitioYa. Tu negocio en internet, ya. Link en la bio 👆" },
 ];
 export const TOTAL = SCENES.reduce((a, s) => a + s.d, 0);
 
@@ -36,9 +36,11 @@ const pop = (frame: number, fps: number, delay = 0, damping = 11) => spring({ fr
 
 // Subtítulos tipo karaoke: aparecen palabra por palabra
 const Subs: React.FC<{ text: string; dur: number; dark?: boolean }> = ({ text, dur, dark }) => {
+  const sc = SCENES.find((x) => x.t === text);
+  const vd = sc ? sc.v : dur * 0.8;
   const f = useCurrentFrame();
   const words = text.split(" ");
-  const shown = interpolate(f, [6, dur * 0.8], [0, words.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const shown = interpolate(f, [6, 6 + vd * 0.92], [0, words.length], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   return (
     <div style={{ position: "absolute", left: 70, right: 70, top: 1470, textAlign: "center", fontFamily: "DM", fontWeight: 800, fontSize: 52, lineHeight: 1.45 }}>
       {words.map((w, i) => {
@@ -266,7 +268,7 @@ export const ComoFunciona: React.FC<{ voz: boolean }> = ({ voz }) => {
           <Sequence key={i} from={start} durationInFrames={s.d}>
             <SceneIn><Comp d={s.d} /></SceneIn>
             {i > 0 && <Whoosh />}
-            {voz && <Audio src={staticFile(`voz/${i}.mp3`)} />}
+            {voz && <Sequence from={6} layout="none"><Audio src={staticFile(`voz/${i}.mp3`)} volume={1} /></Sequence>}
           </Sequence>
         );
       })}
