@@ -120,8 +120,8 @@ const S2: React.FC<{ d: number }> = ({ d }) => {
   const f = useCurrentFrame(); const { fps } = useVideoConfig();
   const tpl = ["panaderia", "barberia", "tienda", "reposteria", "gimnasio", "restaurante"];
   const pick = 1; const clickAt = 62;
-  const cx = interpolate(f, [30, clickAt], [900, 540], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
-  const cy = interpolate(f, [30, clickAt], [1400, 760], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+  const cx = interpolate(f, [30, clickAt], [900, 770], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
+  const cy = interpolate(f, [30, clickAt], [1400, 515], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });
   const grow = spring({ frame: f - clickAt - 4, fps, config: { damping: 16 } });
   return (
     <AbsoluteFill style={{ background: C.navy }}>
@@ -150,7 +150,7 @@ const S3: React.FC<{ d: number }> = ({ d }) => {
   return (
     <AbsoluteFill style={{ background: C.mint }}>
       <Title color={C.navy} size={88}>Lista para el celular 📱</Title>
-      <Phone src={shot("panaderia_full")} x={250} y={330} w={580} h={1060} scroll={700} delay={2}>
+      <Phone src={shot("panaderia_full")} x={250} y={330} w={580} h={1060} scroll={470} delay={2}>
         <div style={{ position: "absolute", right: 22, bottom: 26, background: C.wa, color: "#fff", fontFamily: "DM", fontWeight: 800, fontSize: 30, padding: "14px 24px", borderRadius: 99, transform: `scale(${f > 40 ? pulse : 0})`, boxShadow: "0 10px 30px rgba(0,0,0,.25)" }}>💬 WhatsApp</div>
       </Phone>
       <Subs text={SCENES[2].t} dur={d} />
@@ -219,7 +219,7 @@ const S6: React.FC<{ d: number }> = ({ d }) => {
   return (
     <AbsoluteFill style={{ background: C.coral }}>
       <Title color={C.cream}>3 · Comparte 🔗</Title>
-      <Phone src={shot("tienda_full")} x={110} y={330} w={500} h={920} scroll={500} delay={0}>
+      <Phone src={shot("tienda_full")} x={110} y={330} w={500} h={920} scroll={450} delay={0}>
         <div style={{ position: "absolute", left: 16, right: 16, top: 14, background: "#fff", borderRadius: 99, padding: "10px 18px", fontFamily: "DM", fontWeight: 800, fontSize: 24, color: C.navy, boxShadow: "0 4px 14px rgba(0,0,0,.15)" }}>🔒 tunegocio.com</div>
       </Phone>
       <div style={{ position: "absolute", left: 660, top: 420, display: "grid", gap: 40 }}>
